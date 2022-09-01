@@ -4,6 +4,14 @@ mod tasks;
 use structopt::StructOpt;
 use cli::{Action::*, CommandLineArgs};
 use tasks::Task;
+use std::path::PathBuf;
+
+fn find_default_journal() -> Option<PathBuf> {
+    home::home_dir().map(|mut path| {
+        path.push(".rusty-jornal.json");
+        path
+    })
+}
 
 fn main() {
     // get cmd args
@@ -13,7 +21,7 @@ fn main() {
     } = CommandLineArgs::from_args();
 
     // unpack file
-    let journal_file = journal_file.expect("Failed to find file");
+    let journal_file = journal_file.or_else(find_default_journal).expect("Failed to find file");
 
     // perform action
     match action {
